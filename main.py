@@ -220,7 +220,7 @@ solucao = copy.deepcopy(melhorSolucaoAtual)
 solucao = copy.deepcopy(buscaLocal(solucao))
 
 # Busca local com a solução inicial
-while ((time.time() - start_time) < 15):
+while ((time.time() - start_time) < 20):
     solucao = buscaLocal(solucao)
     makespannovo = calculaMakespan(solucao)
     if (makespannovo <= makespanGlobal):
@@ -240,14 +240,16 @@ while ((time.time() - start_time) < opts.tempo_execucao):
     s2 = buscaLocal(s1)
 
     makespannovo = calculaMakespan(s2)
-    if (makespannovo <= makespanGlobal):
-        print('Novo makespan DENTRO DO LAÇO PRINCIPAL: ', makespannovo)
-        print("--- %s seconds ---" % (time.time() - start_time))
-        tempoMelhorSolucao = (time.time() - start_time)
-        makespanGlobal = makespannovo
-        melhorSolucaoAtual = copy.deepcopy(s2)
-
-    solucao = copy.deepcopy(melhorSolucaoAtual)
+    if (makespannovo <= makespanGlobal + 5):
+        if (makespannovo<=makespanGlobal):
+            print('Novo makespan DENTRO DO LAÇO PRINCIPAL: ', makespannovo)
+            print("--- %s seconds ---" % (time.time() - start_time))
+            tempoMelhorSolucao = (time.time() - start_time)
+            makespanGlobal = makespannovo
+            melhorSolucaoAtual = copy.deepcopy(s2)
+        solucao = copy.deepcopy(s2)
+    else:
+        solucao = copy.deepcopy(melhorSolucaoAtual)
 
 final_makespan = calculaMakespan(melhorSolucaoAtual)
 print("Makespan FINAL: ", final_makespan)
