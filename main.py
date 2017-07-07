@@ -94,8 +94,17 @@ def insereEShift(listaDeTarefas,posASerInserida,posASerRemovida):
 
     listaProvisoria = copy.deepcopy(listaDeTarefas)
     tarefaAInserir = listaProvisoria[posASerRemovida]
-    for i in range(posASerRemovida,posASerInserida,-1):
-        listaProvisoria[i]=listaDeTarefas[i-1]
+
+    if (posASerInserida==posASerRemovida):
+        return listaProvisoria
+    else:
+        if (posASerInserida<posASerRemovida):
+            for i in range(posASerRemovida,posASerInserida,-1):
+                listaProvisoria[i]=listaDeTarefas[i-1]
+        else:
+            if (posASerInserida>posASerRemovida):
+                for i in range(posASerRemovida,posASerInserida):
+                    listaProvisoria[i]=listaDeTarefas[i+1]
 
     listaProvisoria[posASerInserida]=tarefaAInserir
     return listaProvisoria
@@ -126,20 +135,34 @@ def constroiNovaLista(listaPermutada, posASerInserida):
 
 # buscaLocal:
 def buscaLocal(listaDeTarefas):
+    global makespanGlobal
+    global tempoMelhorSolucao
+    global melhorSolucaoAtual
     from random import randint
 
-    random1 = randint(1, len(listaDeTarefas)-2)
-    random2 = randint(random1+1,len(listaDeTarefas)-1)
-    posASerInserida = random1
-    posASerRemovida = random2
+    makespanInicial = makespanGlobal
 
-    copiaLista=copy.deepcopy(listaDeTarefas)
+    copiaLista = copy.deepcopy(listaDeTarefas)
 
-    listaPermutada=copy.deepcopy(insereEShift(copiaLista,posASerInserida,posASerRemovida))
+    melhorou = True
+    while (melhorou==True):
+        random1 = randint(1, len(listaDeTarefas) - 2)
+        random2 = randint(random1 + 1, len(listaDeTarefas) - 1)
+        posASerInserida = random1
+        posASerRemovida = random2
 
-    novaLista=copy.deepcopy(constroiNovaLista(listaPermutada,posASerInserida))
+        listaPermutada = copy.deepcopy(insereEShift(copiaLista, posASerInserida, posASerRemovida))
 
-    return novaLista
+        novaLista = copy.deepcopy(constroiNovaLista(listaPermutada, posASerInserida))
+        makenovo = calculaMakespan(novaLista)
+        if (makenovo < makespanInicial):
+            makespanInicial=makenovo
+            melhorou = True
+            copiaLista = copy.deepcopy(novaLista)
+        else:
+            melhorou = False
+
+    return copiaLista
 
 # imprimeListaTarefas: Imprime uma lista de tarefas, com seu label, tempo de processamento e tempo de início
 def imprimeListaTarefas(listaDeTarefas):
@@ -205,6 +228,7 @@ if not opts.__dict__['tempo_execucao']:
     opts.tempo_execucao = 1800
     print(
         'Parametro -t não informado. Prosseguindo com o padrão de %s segundos para execução' % opts.tempo_execucao)
+imprimeLabel(melhorSolucaoAtual)
 
 # Geração do arquivo de log para a solução
 arq_saida = open(optparse.gettext(opts.saida), 'w')
@@ -219,17 +243,17 @@ solucao = copy.deepcopy(melhorSolucaoAtual)
 
 solucao = copy.deepcopy(buscaLocal(solucao))
 
-# Busca local com a solução inicial
-while ((time.time() - start_time) < 20):
-    solucao = buscaLocal(solucao)
-    makespannovo = calculaMakespan(solucao)
-    if (makespannovo <= makespanGlobal):
-        print('Novo makespan DENTRO DO PRIMEIRO BUSCA LOCAL: ', makespannovo)
-        print("--- %s seconds ---" % (time.time() - start_time))
-        tempoMelhorSolucao = (time.time() - start_time)
-        makespanGlobal = makespannovo
-        melhorSolucaoAtual = copy.deepcopy(solucao)
-    solucao = copy.deepcopy(melhorSolucaoAtual)
+# # Busca local com a solução inicial
+# while ((time.time() - start_time) < 20):
+#     solucao = buscaLocal(solucao)
+#     makespannovo = calculaMakespan(solucao)
+#     if (makespannovo <= makespanGlobal):
+#         print('Novo makespan DENTRO DO PRIMEIRO BUSCA LOCAL: ', makespannovo)
+#         print("--- %s seconds ---" % (time.time() - start_time))
+#         tempoMelhorSolucao = (time.time() - start_time)
+#         makespanGlobal = makespannovo
+#         melhorSolucaoAtual = copy.deepcopy(solucao)
+#     solucao = copy.deepcopy(melhorSolucaoAtual)
 
 # Laço principal do ILS
 while ((time.time() - start_time) < opts.tempo_execucao):
@@ -240,7 +264,7 @@ while ((time.time() - start_time) < opts.tempo_execucao):
     s2 = buscaLocal(s1)
 
     makespannovo = calculaMakespan(s2)
-    if (makespannovo <= makespanGlobal + 5):
+    if (makespannovo <= makespanGlobal):
         if (makespannovo<=makespanGlobal):
             print('Novo makespan DENTRO DO LAÇO PRINCIPAL: ', makespannovo)
             print("--- %s seconds ---" % (time.time() - start_time))
