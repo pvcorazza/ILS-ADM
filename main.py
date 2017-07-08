@@ -156,6 +156,7 @@ def buscaLocal(listaDeTarefas):
         novaLista = copy.deepcopy(constroiNovaLista(listaPermutada, posASerInserida))
         makenovo = calculaMakespan(novaLista)
         if (makenovo < makespanInicial):
+            tempoMelhorSolucao = (time.time() - start_time)
             makespanInicial=makenovo
             melhorou = True
             copiaLista = copy.deepcopy(novaLista)
@@ -255,6 +256,7 @@ solucao = copy.deepcopy(buscaLocal(solucao))
 #         melhorSolucaoAtual = copy.deepcopy(solucao)
 #     solucao = copy.deepcopy(melhorSolucaoAtual)
 
+
 # Laço principal do ILS
 while ((time.time() - start_time) < opts.tempo_execucao):
 
@@ -265,12 +267,13 @@ while ((time.time() - start_time) < opts.tempo_execucao):
 
     makespannovo = calculaMakespan(s2)
     if (makespannovo <= makespanGlobal):
-        if (makespannovo<=makespanGlobal):
-            print('Novo makespan DENTRO DO LAÇO PRINCIPAL: ', makespannovo)
-            print("--- %s seconds ---" % (time.time() - start_time))
+        if (makespannovo < makespanGlobal):
             tempoMelhorSolucao = (time.time() - start_time)
-            makespanGlobal = makespannovo
-            melhorSolucaoAtual = copy.deepcopy(s2)
+        print('Novo makespan DENTRO DO LAÇO PRINCIPAL: ', makespannovo)
+        print("--- %s seconds ---" % (time.time() - start_time))
+        makespanGlobal = makespannovo
+        melhorSolucaoAtual = copy.deepcopy(s2)
+
         solucao = copy.deepcopy(s2)
     else:
         solucao = copy.deepcopy(melhorSolucaoAtual)
