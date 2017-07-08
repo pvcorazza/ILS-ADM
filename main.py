@@ -37,6 +37,7 @@ makespanGlobal =0
 tempoMelhorSolucao =0
 melhorSolucaoAtual = []
 
+# Classe que representa uma tarefa
 class Tarefa(object):
     label = 0
     pi = 0
@@ -45,7 +46,7 @@ class Tarefa(object):
 # solucaoInicial: Recebe um nome de arquivo e retorna a solução inicial
 def solucaoInicial(nomeArquivo):
 
-    #Leitura dos dados do arquivo
+    # Leitura dos dados do arquivo
     arquivo = open(nomeArquivo, 'r')
     lista = arquivo.readlines()
     arquivo.close()
@@ -54,10 +55,7 @@ def solucaoInicial(nomeArquivo):
     lista = [int(i) for i in lista]
     tarefas = []
 
-    # numeroTarefas: total de tarefas recebidas do arquivo, é a primeira linha do arquivo
-    numeroTarefas=lista.pop(0);
-
-    #Ordenação da lista do menor tempo de processamento para o maior
+    #Ordenação da lista do maior tempo de processamento para o menor
     lista.sort(reverse=True)
 
     for i in range(len(lista)):
@@ -66,10 +64,7 @@ def solucaoInicial(nomeArquivo):
         tarefa.label=i
         tarefas.append(tarefa)
 
-    solucaoInicial = sum(lista)
-
     listaDeInicios = [0]
-    inicioPrimeiraTarefa = 0
 
     for i in range (len(lista)) :
         listaDeInicios.append(listaDeInicios[i] + lista[i])
@@ -89,6 +84,7 @@ def calculaMakespan(listaDeTarefas):
             makespan = listaDeTarefas[i].pi+listaDeTarefas[i].si
     return makespan
 
+# insereEShift: Recebe uma lista de tarefas e insere a 'posASerRemovida na 'posASerInserida'
 def insereEShift(listaDeTarefas,posASerInserida,posASerRemovida):
 
     listaProvisoria = copy.deepcopy(listaDeTarefas)
@@ -108,6 +104,7 @@ def insereEShift(listaDeTarefas,posASerInserida,posASerRemovida):
     listaProvisoria[posASerInserida]=tarefaAInserir
     return listaProvisoria
 
+# comparaTarefas: Aplica a restrição para retornar o tempo inicial em que deve inserir determinada tarefa
 def comparaTarefas(pos, lista):
     minimoentreatualeanterior = min(lista[pos-1].pi, lista[pos].pi)
     minimoainserir = lista[pos-1].si + minimoentreatualeanterior
@@ -125,14 +122,14 @@ def comparaTarefas(pos, lista):
 
     return tempo
 
-# constroiNovaLista:
+# constroiNovaLista: Constroi nova lista obedecendo as restrições.
 def constroiNovaLista(listaPermutada, posASerInserida):
     for i in range(posASerInserida,len(listaPermutada)):
         tempo = comparaTarefas(i,listaPermutada)
         listaPermutada[i].si = tempo
     return listaPermutada
 
-# buscaLocal:
+# buscaLocal: Retorna um possível melhor valor local
 def buscaLocal(listaDeTarefas):
     global makespanGlobal
     global tempoMelhorSolucao
@@ -193,18 +190,12 @@ def interchange(lista,qtd_swaps):
 
     return copy.deepcopy(copiaLista)
 
+# Faz uma perturbação na lista, de forma a explorar novos mínimos no espaço de soluções
 def perturbaLista(lista):
 
     lista = copy.deepcopy(interchange(lista, opts.qtd_interchanges))
     lista = copy.deepcopy(constroiNovaLista(lista, 1))
     return lista
-
-def ils(solucao):
-
-    global makespanGlobal
-    global tempoMelhorSolucao
-    global melhorSolucaoAtual
-
 
 
 # ------------------ Início
@@ -228,7 +219,6 @@ if not opts.__dict__['tempo_execucao']:
     opts.tempo_execucao = 1800
     print(
         'Parametro -t não informado. Prosseguindo com o padrão de %s segundos para execução' % opts.tempo_execucao)
-imprimeLabel(melhorSolucaoAtual)
 
 # Geração do arquivo de log para a solução
 arq_saida = open(optparse.gettext(opts.saida), 'w')
@@ -243,17 +233,6 @@ solucao = copy.deepcopy(melhorSolucaoAtual)
 
 solucao = copy.deepcopy(buscaLocal(solucao))
 
-# # Busca local com a solução inicial
-# while ((time.time() - start_time) < 20):
-#     solucao = buscaLocal(solucao)
-#     makespannovo = calculaMakespan(solucao)
-#     if (makespannovo <= makespanGlobal):
-#         print('Novo makespan DENTRO DO PRIMEIRO BUSCA LOCAL: ', makespannovo)
-#         print("--- %s seconds ---" % (time.time() - start_time))
-#         tempoMelhorSolucao = (time.time() - start_time)
-#         makespanGlobal = makespannovo
-#         melhorSolucaoAtual = copy.deepcopy(solucao)
-#     solucao = copy.deepcopy(melhorSolucaoAtual)
 
 # Laço principal do ILS
 while ((time.time() - start_time) < opts.tempo_execucao):
@@ -266,14 +245,15 @@ while ((time.time() - start_time) < opts.tempo_execucao):
     makespannovo = calculaMakespan(s2)
     if (makespannovo <= makespanGlobal+5):
         if (makespannovo<makespanGlobal):
+
             print('NOVO MAKESPAN ENCONTRADO: ', makespannovo)
+
             print("--- %.2f seconds ---" % (time.time() - start_time))
             tempoMelhorSolucao = (time.time() - start_time)
             makespanGlobal = makespannovo
             melhorSolucaoAtual = copy.deepcopy(s2)
         solucao = copy.deepcopy(s2)
-    else:
-        solucao = copy.deepcopy(melhorSolucaoAtual)
+
 
 final_makespan = calculaMakespan(melhorSolucaoAtual)
 print("Makespan FINAL: ", final_makespan)
