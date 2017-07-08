@@ -67,7 +67,6 @@ def solucaoInicial(nomeArquivo):
         tarefas.append(tarefa)
 
     solucaoInicial = sum(lista)
-    print(solucaoInicial)
 
     listaDeInicios = [0]
     inicioPrimeiraTarefa = 0
@@ -156,6 +155,7 @@ def buscaLocal(listaDeTarefas):
         novaLista = copy.deepcopy(constroiNovaLista(listaPermutada, posASerInserida))
         makenovo = calculaMakespan(novaLista)
         if (makenovo < makespanInicial):
+            tempoMelhorSolucao = (time.time() - start_time)
             makespanInicial=makenovo
             melhorou = True
             copiaLista = copy.deepcopy(novaLista)
@@ -221,7 +221,7 @@ if (opts.__dict__['qtd_interchanges']):
         print("Parametro (interchanges) inválido. Deve ser um numero menor ou igual a ", limite)
         exit(-1)
 else:
-    opts.qtd_interchanges = math.floor(len(melhorSolucaoAtual) * 0.05)
+    opts.qtd_interchanges = math.floor(len(melhorSolucaoAtual) * 0.02)
     print('Parametro -i não informado. Prosseguindo com o padrão de %s interchange(s)' % opts.qtd_interchanges)
 
 if not opts.__dict__['tempo_execucao']:
@@ -264,10 +264,10 @@ while ((time.time() - start_time) < opts.tempo_execucao):
     s2 = buscaLocal(s1)
 
     makespannovo = calculaMakespan(s2)
-    if (makespannovo <= makespanGlobal):
-        if (makespannovo<=makespanGlobal):
-            print('Novo makespan DENTRO DO LAÇO PRINCIPAL: ', makespannovo)
-            print("--- %s seconds ---" % (time.time() - start_time))
+    if (makespannovo <= makespanGlobal+5):
+        if (makespannovo<makespanGlobal):
+            print('NOVO MAKESPAN ENCONTRADO: ', makespannovo)
+            print("--- %.2f seconds ---" % (time.time() - start_time))
             tempoMelhorSolucao = (time.time() - start_time)
             makespanGlobal = makespannovo
             melhorSolucaoAtual = copy.deepcopy(s2)
