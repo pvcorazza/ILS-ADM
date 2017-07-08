@@ -55,7 +55,10 @@ def solucaoInicial(nomeArquivo):
     lista = [int(i) for i in lista]
     tarefas = []
 
-    #Ordenação da lista do maior tempo de processamento para o menor
+    # numeroTarefas: total de tarefas recebidas do arquivo, é a primeira linha do arquivo
+    numeroTarefas=lista.pop(0);
+
+    #Ordenação da lista do menor tempo de processamento para o maior
     lista.sort(reverse=True)
 
     for i in range(len(lista)):
@@ -63,6 +66,7 @@ def solucaoInicial(nomeArquivo):
         tarefa.pi = lista[i]
         tarefa.label=i
         tarefas.append(tarefa)
+
 
     listaDeInicios = [0]
 
@@ -253,7 +257,6 @@ while ((time.time() - start_time) < opts.tempo_execucao):
             makespanGlobal = makespannovo
             melhorSolucaoAtual = copy.deepcopy(s2)
         solucao = copy.deepcopy(s2)
-
 
 final_makespan = calculaMakespan(melhorSolucaoAtual)
 print("Makespan FINAL: ", final_makespan)
